@@ -1,2 +1,1 @@
-# FLOODCARE-AI
-AI chatbot for flood information and emergency assistance using LINE Official Account.
+# FLOODCARE AI Starter\nThis is a starter template.

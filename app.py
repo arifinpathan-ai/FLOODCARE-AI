@@ -20,7 +20,7 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 # เปลี่ยนมาใช้โมเดลรุ่นเสถียรตัวปัจจุบัน
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 @app.route("/")
 def index():

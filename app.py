@@ -1,4 +1,5 @@
-import os
+import os 
+from water_service import update_water_levels_sheet
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -107,10 +108,26 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         except Exception as line_error:
             print(f"Error sending LINE message: {line_error}")
+# ส่งข้อความจาก AI กลับไปที่ LINE
+try:
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+except Exception as line_error:
+    print(f"Error sending LINE message: {line_error}")
+
+# --- วางโค้ดตรงนี้ครับ ---
+@app.route("/update-water-data", methods=["GET"])
+def trigger_update():
+    if update_water_levels_sheet():
+        return "Update Success", 200
+    else:
+        return "Update Failed", 500
+# -----------------------
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
 
 
 

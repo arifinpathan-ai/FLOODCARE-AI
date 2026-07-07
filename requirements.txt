@@ -2,3 +2,7 @@ line-bot-sdk==1.16.0
 flask==3.0.3
 google-generativeai==0.8.3
 gunicorn==22.0.0
+gspread
+requests
+oauth2client
+

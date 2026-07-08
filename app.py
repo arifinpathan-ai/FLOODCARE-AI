@@ -108,11 +108,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         except Exception as line_error:
             print(f"Error sending LINE message: {line_error}")
-# ส่งข้อความจาก AI กลับไปที่ LINE
-try:
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-except Exception as line_error:
-    print(f"Error sending LINE message: {line_error}")
+
 
 # --- วางโค้ดตรงนี้ครับ ---
 @app.route("/update-water-data", methods=["GET"])

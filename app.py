@@ -113,8 +113,8 @@ def handle_message(event):
         reply_message = TextSendMessage(text=EMERGENCY_MSG)
         line_bot_api.reply_message(event.reply_token, reply_message)
         
-    # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
-        else:
+      # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
+    else:
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
@@ -124,7 +124,7 @@ def handle_message(event):
                 if response.parts:
                     reply_text = response.text
                     
-                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดพื้นหลังสวยๆ)
+                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)
                     flex_reply = FlexSendMessage(
                         alt_text="คำตอบจาก FLOODCARE AI",
                         contents={
@@ -134,48 +134,27 @@ def handle_message(event):
                                 "layout": "vertical",
                                 "contents": [
                                     {
-                                        "type": "box",
-                                        "layout": "horizontal",
-                                        "contents": [
-                                            {
-                                                "type": "text",
-                                                "text": "🤖 FLOODCARE AI",
-                                                "weight": "bold",
-                                                "color": "#1E40AF",
-                                                "size": "md"
-                                            },
-                                            {
-                                                "type": "text",
-                                                "text": "AI",
-                                                "align": "end",
-                                                "color": "#9CA3AF",
-                                                "size": "sm"
-                                            }
-                                        ]
+                                        "type": "text", 
+                                        "text": "🤖 FLOODCARE AI", 
+                                        "weight": "bold", 
+                                        "color": "#1E40AF"
                                     },
+                                    {"type": "separator", "margin": "md"},
                                     {
-                                        "type": "separator",
-                                        "margin": "md"
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": reply_text,
-                                        "wrap": True,
-                                        "margin": "lg",
-                                        "color": "#374151",
-                                        "size": "sm"
+                                        "type": "text", 
+                                        "text": reply_text, 
+                                        "wrap": True, 
+                                        "margin": "lg", 
+                                        "color": "#374151"
                                     }
                                 ]
                             }
                         }
                     )
-                    # สั่งส่งการ์ด Flex กลับไปที่ LINE
                     line_bot_api.reply_message(event.reply_token, flex_reply)
-                    
                 else:
-                    reply_text = "⚠️ Gemini ไม่สามารถตอบข้อความนี้ได้เนื่องจากติดตัวกรองความปลอดภัย"
+                    reply_text = "⚠️ Gemini ไม่สามารถตอบข้อความนี้ได้"
                     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-            
             except Exception as e:
                 reply_text = f"❌ Gemini API Error:\n{str(e)}"
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))

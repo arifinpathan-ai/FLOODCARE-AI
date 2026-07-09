@@ -3,7 +3,9 @@ from water_service import update_water_levels_sheet
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
+
+
 import google.generativeai as genai
 
 app = Flask(__name__)
@@ -112,24 +114,71 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, reply_message)
         
     # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
-    else:
+        else:
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         else:
             try:
                 response = model.generate_content(user_text)
                 if response.parts:
                     reply_text = response.text
+                    
+                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดพื้นหลังสวยๆ)
+                    flex_reply = FlexSendMessage(
+                        alt_text="คำตอบจาก FLOODCARE AI",
+                        contents={
+                            "type": "bubble",
+                            "body": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "🤖 FLOODCARE AI",
+                                                "weight": "bold",
+                                                "color": "#1E40AF",
+                                                "size": "md"
+                                            },
+                                            {
+                                                "type": "text",
+                                                "text": "AI",
+                                                "align": "end",
+                                                "color": "#9CA3AF",
+                                                "size": "sm"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "separator",
+                                        "margin": "md"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": reply_text,
+                                        "wrap": True,
+                                        "margin": "lg",
+                                        "color": "#374151",
+                                        "size": "sm"
+                                    }
+                                ]
+                            }
+                        }
+                    )
+                    # สั่งส่งการ์ด Flex กลับไปที่ LINE
+                    line_bot_api.reply_message(event.reply_token, flex_reply)
+                    
                 else:
                     reply_text = "⚠️ Gemini ไม่สามารถตอบข้อความนี้ได้เนื่องจากติดตัวกรองความปลอดภัย"
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+            
             except Exception as e:
                 reply_text = f"❌ Gemini API Error:\n{str(e)}"
-
-        # ส่งข้อความจาก AI กลับไปที่ LINE
-        try:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-        except Exception as line_error:
-            print(f"Error sending LINE message: {line_error}")
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
 
 
 # --- วางโค้ดตรงนี้ครับ ---

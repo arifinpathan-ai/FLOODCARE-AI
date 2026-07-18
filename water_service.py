@@ -37,7 +37,8 @@ def update_thaiwater_data():
 
         # 3. อัปเดตลง Google Sheets
         # *** อย่าลืมเปลี่ยนชื่อตรงนี้ให้ตรงกับไฟล์ชีทของคุณ ***
-        sheet = client.open('YOUR_SHEET_NAME').worksheet('WaterLevel')
+        sheet = client.open('FLOODCARE_DB').worksheet('Water_Levels')
+
         
         new_rows = []
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -1,5 +1,6 @@
 import os 
-from water_service import update_water_levels_sheet
+from water_service import update_thaiwater_data
+
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -163,7 +164,8 @@ def handle_message(event):
 # --- วางโค้ดตรงนี้ครับ ---
 @app.route("/update-water-data", methods=["GET"])
 def trigger_update():
-    if update_water_levels_sheet():
+    if update_thaiwater_data():
+
         return "Update Success", 200
     else:
         return "Update Failed", 500

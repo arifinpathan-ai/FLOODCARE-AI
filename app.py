@@ -116,12 +116,12 @@ def handle_message(event):
         reply_message = TextSendMessage(text=EMERGENCY_MSG)
         line_bot_api.reply_message(event.reply_token, reply_message)
         
-      # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
+    # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
     else:
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-   else:
+        else:
             try:
                 water_data = get_water_data()
 
@@ -173,7 +173,8 @@ def handle_message(event):
             except Exception as e:
                 reply_text = f"❌ Gemini API Error:\n{str(e)}"
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-        @app.route("/update-water-data", methods=["GET"])
+
+@app.route("/update-water-data", methods=["GET"])
 def trigger_update():
     if update_thaiwater_data():
         return "Update Success", 200

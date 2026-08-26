@@ -143,14 +143,8 @@ else:
                     flex_reply = FlexSendMessage(
                         alt_text="คำตอบจาก FLOODCARE AI",
                         contents={
-
-
                 
-
-                        
-
-              
-                            "type": "bubble",
+                    "type": "bubble",
                             "body": {
                                 "type": "box",
                                 "layout": "vertical",

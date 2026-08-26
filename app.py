@@ -1,13 +1,10 @@
 import os
-from water_service import update_thaiwater_data
 from sheets import get_water_data
-
 
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
-
 
 import google.generativeai as genai
 
@@ -25,12 +22,8 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 # ตั้งค่า Gemini API
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-# ใช้โมเดลรุ่นปัจจุบัน
-# ตั้งค่า Gemini API
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
 
-# 🎯 วางคำสั่งควบคุมพฤติกรรมแทรกไว้ตรงนี้
+# 🎯 คำสั่งควบคุมพฤติกรรมของ AI
 FLOODCARE_SYSTEM_PROMPT = """
 คุณคือ "FLOODCARE AI" ผู้ช่วยอัจฉริยะที่เชี่ยวชาญและอุทิศตนเพื่อช่วยเหลือประชาชนในด้านการเฝ้าระวังน้ำท่วม สภาพอากาศ และความปลอดภัยจากภัยพิบัติ
 
@@ -43,15 +36,13 @@ FLOODCARE_SYSTEM_PROMPT = """
 "ขออภัยด้วยนะครับ/ค่ะ FLOODCARE AI เป็นผู้ช่วยเฉพาะทางด้านการเฝ้าระวังน้ำท่วมและสภาพอากาศเพื่อความปลอดภัย จึงอาจจะไม่สามารถแนะนำเรื่องนี้ได้โดยตรง... แต่ถ้าตอนนี้ในพื้นที่ของคุณมีปัญหาน้ำท่วม หรือต้องการเช็กระดับน้ำ พิมพ์บอกได้เลยนะครับ!"
 """
 
-# ใช้โมเดลรุ่นเดิมของคุณ แต่ผูกคำสั่งระบบเข้าไปด้วย
 model = genai.GenerativeModel(
     model_name='gemini-2.5-flash',
     system_instruction=FLOODCARE_SYSTEM_PROMPT
 )
 
-
 # ==========================================
-# ส่วนที่ 1: เตรียมข้อความตอบกลับอัตโนมัติ (ไม่ต้องใช้ AI)
+# ข้อความตอบกลับอัตโนมัติ
 # ==========================================
 GREETING_MSG = """สวัสดีครับ
 ผมคือ FLOODCARE AI
@@ -100,11 +91,11 @@ def callback():
     return 'OK'
 
 # ==========================================
-# ส่วนที่ 2: ระบบคัดกรองข้อความ (ดักคีย์เวิร์ด)
+# ระบบจัดการข้อความจากผู้ใช้
 # ==========================================
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_text = event.message.text.strip() # รับข้อความที่ผู้ใช้พิมพ์มา
+    user_text = event.message.text.strip()
     
     # ดักจับคำทักทาย
     if user_text in ["สวัสดี", "สวัสดีครับ", "สวัสดีค่ะ", "เริ่มการใช้งาน"]:
@@ -116,13 +107,14 @@ def handle_message(event):
         reply_message = TextSendMessage(text=EMERGENCY_MSG)
         line_bot_api.reply_message(event.reply_token, reply_message)
         
-    # ถ้าพิมพ์คำอื่นๆ ที่ไม่ได้กำหนดไว้ ให้ส่งไปถาม AI Gemini
+    # ถ้าเป็นข้อความอื่นๆ ส่งให้ Gemini ประมวลผลร่วมกับข้อมูลจาก Google Sheets
     else:
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         else:
             try:
+                # ดึงข้อมูลจาก Google Sheets ผ่าน sheets.py
                 water_data = get_water_data()
 
                 full_prompt = f"""
@@ -139,7 +131,7 @@ def handle_message(event):
                 if response.parts:
                     reply_text = response.text
 
-                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)
+                    # แปลงคำตอบเป็น Flex Message
                     flex_reply = FlexSendMessage(
                         alt_text="คำตอบจาก FLOODCARE AI",
                         contents={
@@ -176,15 +168,12 @@ def handle_message(event):
 
 @app.route("/update-water-data", methods=["GET"])
 def trigger_update():
-    if update_thaiwater_data():
-        return "Update Success", 200
-    else:
-        return "Update Failed", 500
+    return "Update Success", 200
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-        
+
 
 
 

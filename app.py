@@ -121,32 +121,35 @@ def handle_message(event):
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-    else: 
-        try:
-          water_data = get_water_data()
+else:
+                try:
+                water_data = get_water_data()
 
-          full_prompt = f"""
-         คำถามจากผู้ใช้: {user_text}
+                full_prompt = f"""
+                คำถามจากผู้ใช้: {user_text}
 
-         ข้อมูลระดับน้ำล่าสุดจากระบบ (Google Sheet):
-         {water_data}
+                ข้อมูลระดับน้ำล่าสุดจากระบบ (Google Sheet):
+                {water_data}
 
-         โปรดนำข้อมูลระดับน้ำข้างต้นมาสรุปตอบผู้ใช้ให้เข้าใจง่าย
-         """
+                โปรดนำข้อมูลระดับน้ำข้างต้นมาสรุปตอบผู้ใช้ให้เข้าใจง่าย
+                """
 
-         response = model.generate_content(full_prompt)
+                response = model.generate_content(full_prompt)
+
+                if response.parts:  # 👈 ลบช่องว่างด้านหน้าออก ให้แนวตรงกับคำว่า response ด้านบนเป๊ะๆ
+                    reply_text = response.text
+
+                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)
+                    flex_reply = FlexSendMessage(
+                        alt_text="คำตอบจาก FLOODCARE AI",
+                        contents={
+
 
                 
 
                         
 
-              if response.parts:
-                    reply_text = response.text
-                    
-                    # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)
-                    flex_reply = FlexSendMessage(
-                        alt_text="คำตอบจาก FLOODCARE AI",
-                        contents={
+              
                             "type": "bubble",
                             "body": {
                                 "type": "box",

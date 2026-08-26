@@ -136,13 +136,11 @@ def handle_message(event):
 
          response = model.generate_content(full_prompt)
 
-                if response.parts:  # 👈 บรรทัดนี้และบล็อกข้างล่าง ต้องขยับมาให้ตรงแนวกับ response
-                    reply_text = response.text
-
+                
 
                         
 
-                if response.parts:
+              if response.parts:
                     reply_text = response.text
                     
                     # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)

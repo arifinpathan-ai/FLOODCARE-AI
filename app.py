@@ -1,5 +1,7 @@
 import os 
 from water_service import update_thaiwater_data
+from water_service import update_thaiwater_data
+from sheets import get_water_data  # 👈 แทรกบรรทัดนี้ที่บรรทัดที่ 3
 
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler

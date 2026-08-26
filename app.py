@@ -173,21 +173,19 @@ def handle_message(event):
             except Exception as e:
                 reply_text = f"❌ Gemini API Error:\n{str(e)}"
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-                
-
-# --- วางโค้ดตรงนี้ครับ ---
-@app.route("/update-water-data", methods=["GET"])
+        @app.route("/update-water-data", methods=["GET"])
 def trigger_update():
     if update_thaiwater_data():
-
         return "Update Success", 200
     else:
         return "Update Failed", 500
-# -----------------------
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+        
+
+
 
 
 

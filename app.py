@@ -122,8 +122,23 @@ def handle_message(event):
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         else:
-            try:
-                response = model.generate_content(user_text)
+                        try:
+                # 1. ดึงข้อมูลจาก Google Sheet
+                water_data = get_water_data()
+
+                # 2. รวมคำถามผู้ใช้เข้ากับข้อมูลระดับน้ำ
+                full_prompt = f"""
+                คำถามจากผู้ใช้: {user_text}
+
+                ข้อมูลระดับน้ำล่าสุดจากระบบ (Google Sheet):
+                {water_data}
+
+                โปรดนำข้อมูลระดับน้ำข้างต้นมาสรุปตอบผู้ใช้ให้เข้าใจง่าย
+                """
+
+                # 3. ส่ง Prompt รวมให้ Gemini ประมวลผล
+                response = model.generate_content(full_prompt)
+
                 if response.parts:
                     reply_text = response.text
                     

@@ -5,4 +5,6 @@ gunicorn==22.0.0
 gspread
 requests
 oauth2client
+google-auth
+
 

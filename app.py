@@ -121,7 +121,7 @@ def handle_message(event):
         if not GEMINI_API_KEY:
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-else:
+   else:
             try:
                 water_data = get_water_data()
 

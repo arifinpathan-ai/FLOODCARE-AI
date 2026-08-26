@@ -122,7 +122,7 @@ def handle_message(event):
             reply_text = "❌ ระบบยังไม่ได้ตั้งค่า GEMINI_API_KEY"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
 else:
-                try:
+            try:
                 water_data = get_water_data()
 
                 full_prompt = f"""
@@ -136,31 +136,30 @@ else:
 
                 response = model.generate_content(full_prompt)
 
-                if response.parts:  # 👈 ลบช่องว่างด้านหน้าออก ให้แนวตรงกับคำว่า response ด้านบนเป๊ะๆ
+                if response.parts:
                     reply_text = response.text
 
                     # 🎯 แปลงคำตอบเป็น Flex Message (การ์ดสวยๆ)
                     flex_reply = FlexSendMessage(
                         alt_text="คำตอบจาก FLOODCARE AI",
                         contents={
-                
-                    "type": "bubble",
+                            "type": "bubble",
                             "body": {
                                 "type": "box",
                                 "layout": "vertical",
                                 "contents": [
                                     {
-                                        "type": "text", 
-                                        "text": "🤖 FLOODCARE AI", 
-                                        "weight": "bold", 
+                                        "type": "text",
+                                        "text": "🤖 FLOODCARE AI",
+                                        "weight": "bold",
                                         "color": "#1E40AF"
                                     },
                                     {"type": "separator", "margin": "md"},
                                     {
-                                        "type": "text", 
-                                        "text": reply_text, 
-                                        "wrap": True, 
-                                        "margin": "lg", 
+                                        "type": "text",
+                                        "text": reply_text,
+                                        "wrap": True,
+                                        "margin": "lg",
                                         "color": "#374151"
                                     }
                                 ]
@@ -174,7 +173,7 @@ else:
             except Exception as e:
                 reply_text = f"❌ Gemini API Error:\n{str(e)}"
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-
+                
 
 # --- วางโค้ดตรงนี้ครับ ---
 @app.route("/update-water-data", methods=["GET"])
